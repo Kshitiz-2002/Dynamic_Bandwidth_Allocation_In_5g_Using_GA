@@ -6,6 +6,7 @@ import math
 from typing import List, Tuple
 from sklearn.preprocessing import MinMaxScaler
 import time
+from Algorithms.Genetic import Genetic
 from Algorithms.Access_Aware import AccessAware
 from Models.NARNET import NARNET
 
@@ -60,6 +61,9 @@ n_genes = usage.shape[0]
 num_generations = 100
 num_parents_mating = 25
 
+# Initialize and run the Genetic Algorithm
+ga = Genetic(pop_size=pop_size, n_genes=n_genes, num_generations=num_generations, num_parents_mating=num_parents_mating, usage=usage)
+best_solution, ga_time = ga.run()
 
 # Metrics calculation for GA
 time_points = len(traffic)
@@ -116,3 +120,57 @@ throughput_narnet = np.array(throughput_narnet) * (1 + np.random.normal(0, 0.5, 
 latency_narnet = np.array(latency_narnet) * (1 + np.random.normal(0, 0.5, len(latency_narnet)))
 packet_loss_narnet = np.array(packet_loss_narnet) * (1 + np.random.normal(0, 0.5, len(packet_loss_narnet)))
 
+# Determine the x-axis range from NARNET metrics
+x_range = len(utilization_narnet)
+
+# Plot the comparison graphs
+plt.figure(figsize=(15, 10))
+
+plt.subplot(321)
+plt.plot(range(x_range), utilization_ga[:x_range], label='GA Utilization')
+plt.plot(range(x_range), utilization_narnet, label='NARNET Utilization')
+plt.title('Utilization Over Time')
+plt.xlabel('Time Points')
+plt.ylabel('Utilization')
+plt.legend()
+plt.grid(True)
+
+plt.subplot(322)
+plt.plot(range(x_range), unsatisfied_cells_ga[:x_range], label='GA Unsatisfied Cells')
+plt.plot(range(x_range), unsatisfied_cells_narnet, label='NARNET Unsatisfied Cells')
+plt.title('Unsatisfied Cells Over Time')
+plt.xlabel('Time Points')
+plt.ylabel('Unsatisfied Cells')
+plt.legend()
+plt.grid(True)
+
+plt.subplot(323)
+plt.plot(range(x_range), throughput_ga[:x_range], label='GA Throughput')
+plt.plot(range(x_range), throughput_narnet, label='NARNET Throughput')
+plt.title('Throughput Over Time')
+plt.xlabel('Time Points')
+plt.ylabel('Throughput')
+plt.legend()
+plt.grid(True)
+
+plt.subplot(324)
+plt.plot(range(x_range), latency_ga[:x_range], label='GA Latency')
+plt.plot(range(x_range), latency_narnet, label='NARNET Latency')
+plt.title('Latency Over Time')
+plt.xlabel('Time Points')
+plt.ylabel('Latency')
+plt.legend()
+plt.grid(True)
+
+plt.subplot(325)
+plt.plot(range(x_range), packet_loss_ga[:x_range], label='GA Packet Loss')
+plt.plot(range(x_range), packet_loss_narnet, label='NARNET Packet Loss')
+plt.title('Packet Loss Over Time')
+plt.xlabel('Time Points')
+plt.ylabel('Packet Loss')
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.savefig('./Graphs/comparison_metrics_over_time.png')
+plt.show()
